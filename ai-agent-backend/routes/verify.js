@@ -113,17 +113,16 @@ router.post('/', upload.array('documents'), verifyWeb3AuthJWT, async (req, res) 
     for (const file of files) {
       const ext = path.extname(file.originalname).toLowerCase();
       if (file.mimetype === 'application/pdf' || ext === '.pdf') {
-        const imagePaths = await geminiService.convertPdfToPng(file.path);
-        for (const img of imagePaths) {
-          const url = await uploadFileToBucket(img, file.originalname, hash);
-          imageUrls.push(url);
-          await fs.unlink(img).catch(() => {});
-        }
+        // PDF handling is disabled for Vercel deployment
+        return res.status(400).json({ 
+          success: false, 
+          error: 'PDF files are not supported. Please upload image files (PNG, JPG, JPEG) instead.' 
+        });
       } else {
-        const url = await uploadFileToBucket(file.path, file.originalname, hash);
+        // Upload buffer directly to Supabase (no file path needed)
+        const url = await uploadFileToBucket(file.buffer, file.originalname, hash);
         imageUrls.push(url);
       }
-      await fs.unlink(file.path).catch(() => {});
     }
 
     // 7) Store seller-proof in Supabase instead of recording on-chain

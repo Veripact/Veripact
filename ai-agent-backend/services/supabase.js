@@ -62,24 +62,43 @@ async function storeVerification({
 }
 
 /**
- * Uploads a local file buffer to the Supabase Storage bucket under
- * `documents/<hash>/<random-filename>` and returns its public URL.
+ * Uploads a file (buffer or file path) to Supabase Storage.
  *
- * @param {string} localFilePath - Path to the file on disk.
- * @param {string} originalName - Original filename (to preserve extension).
+ * @param {Buffer|string} fileInput - File buffer or local file path.
+ * @param {string} originalName - The original file name.
  * @param {string} hash - The transaction hash (used as top-level folder).
  * @returns {Promise<string>} Publicly accessible URL of the uploaded file.
  * @throws If the upload or URL fetch fails.
  */
-async function uploadFileToBucket(localFilePath, originalName, hash) {
-  const buffer = fs.readFileSync(localFilePath);
+async function uploadFileToBucket(fileInput, originalName, hash) {
+  let buffer;
+  
+  // Handle both Buffer and file path inputs
+  if (Buffer.isBuffer(fileInput)) {
+    buffer = fileInput;
+  } else if (typeof fileInput === 'string') {
+    // Legacy support for file paths (local development)
+    buffer = fs.readFileSync(fileInput);
+  } else {
+    throw new Error('Invalid file input: must be Buffer or file path string');
+  }
+
   const filename = generateRandomFilename(originalName);
   const storagePath = `documents/${hash}/${filename}`;
+
+  // Determine content type based on file extension
+  const ext = path.extname(originalName).toLowerCase();
+  let contentType = 'image/png';
+  if (ext === '.jpg' || ext === '.jpeg') {
+    contentType = 'image/jpeg';
+  } else if (ext === '.pdf') {
+    contentType = 'application/pdf';
+  }
 
   const { error: uploadError } = await supabase.storage
     .from('documents')
     .upload(storagePath, buffer, {
-      contentType: 'image/png',
+      contentType,
       upsert: true,
     });
   if (uploadError) throw uploadError;

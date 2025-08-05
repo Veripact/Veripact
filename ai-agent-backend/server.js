@@ -18,8 +18,8 @@ const allowedOrigins = [
   'http://localhost:3000',          // Local development
   'https://veripact.vercel.app',    // Production frontend
   'https://www.veripact.vercel.app', // Production frontend with www
-  'https://veripact-the-squids-projects.vercel.app/', // Staging frontend
-  'https://www.veripact-the-squids-projects.vercel.app/' // Staging frontend with www
+  'https://veripact-the-squids-projects.vercel.app', // Staging frontend
+  'https://www.veripact-the-squids-projects.vercel.app' // Staging frontend with www
 ];
 
 app.use(cors({ 
