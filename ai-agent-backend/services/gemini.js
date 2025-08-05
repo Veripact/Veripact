@@ -1,38 +1,12 @@
 // services/gemini.js
 const path    = require('path');
 const axios   = require('axios');
-const { fromPath } = require('pdf2pic');
 require('dotenv').config();
 
 const API_KEY  = process.env.GEMINI_API_KEY;
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 // the exact two model names to try, in order:
 const MODELS   = ['gemini-1.5-flash'];
-
-/**
- * Converts a PDF file to one or more PNG images.
- */
-async function convertPdfToPng(pdfPath) {
-  const outputDir = path.resolve(__dirname, '../uploads');
-  const baseName  = path.basename(pdfPath, '.pdf');
-  const converter = fromPath(pdfPath, {
-    density:     200,
-    saveFilename: baseName,
-    savePath:     outputDir,
-    format:      'png',
-    width:       1024,
-    height:      1024,
-  });
-
-  // for now we only render page 1; bump this if you want more pages
-  const images = [];
-  const pageCount = 1;
-  for (let i = 1; i <= pageCount; i++) {
-    const { path: imgPath } = await converter(i);
-    images.push(imgPath);
-  }
-  return images;
-}
 
 /**
  * Converts a buffer to generative part for Gemini API
@@ -134,5 +108,4 @@ Respond ONLY with this JSON structure:
 
 module.exports = {
   analyzeDocuments,
-  convertPdfToPng,
 };
