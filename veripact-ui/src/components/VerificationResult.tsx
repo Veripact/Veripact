@@ -1,8 +1,6 @@
 // src/components/VerificationResult.tsx
 "use client";
 
-import Link from "next/link";
-
 interface Discrepancy {
   field: string;
   invoice: string;
@@ -35,7 +33,6 @@ export default function VerificationResult({ result }: VerificationResultProps) 
     amount, 
     date, 
     vendorName,
-    overall_match, 
     validationUrl,
     consistency,
     discrepancies 
@@ -87,7 +84,7 @@ export default function VerificationResult({ result }: VerificationResultProps) 
             <ul className="space-y-2 text-sm">
               {discrepancies.map((d, i) => (
                 <li key={i} className="text-red-600 dark:text-red-400">
-                  {d.field}: Invoice shows "{d.invoice}", Receipt shows "{d.receipt}"
+                  {d.field}: Invoice shows &quot;{d.invoice}&quot;, Receipt shows &quot;{d.receipt}&quot;
                 </li>
               ))}
             </ul>

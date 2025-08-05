@@ -5,12 +5,36 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useWeb3Auth } from "@web3auth/modal/react";
 import StarRating from "@/components/StarRating"; // Import the StarRating component
+import Image from "next/image";
 
 // Updated the Verification type to match the actual property name in the data object
 type Verification = {
     images: string[]; // Deprecated, replaced by image_urls
     image_urls: string[]; // New property for image URLs
-    ai_result: any; // Updated from aiResult to ai_result
+    ai_result: {
+        analysis?: {
+            overall_match?: string;
+            consistency?: {
+                Date?: boolean;
+                VendorName?: boolean;
+                TotalAmount?: boolean;
+                TransactionID?: boolean;
+            };
+            discrepancies?: Array<{ field: string; invoice: string; receipt: string }>;
+            invoice?: {
+                Date?: string;
+                VendorName?: string;
+                TotalAmount?: string;
+                TransactionID?: string;
+            };
+            receipt?: {
+                Date?: string;
+                VendorName?: string;
+                TotalAmount?: string;
+                TransactionID?: string;
+            };
+        };
+    }; // Updated from aiResult to ai_result
     sellerRating: number;
     rating_by_client: number | null;
     status: "pending" | "approved" | "rejected";
@@ -62,7 +86,7 @@ export default function ValidatePage() {
                 console.error('Failed to load data:', err);
                 setError("Failed to load data");
             });
-    }, [linkUuid, isConnected, account]);
+    }, [linkUuid, isConnected, account, backendUrl]);
 
     // Login handler
     const login = async () => {
@@ -99,9 +123,9 @@ export default function ValidatePage() {
                     status,
                     initError,
                 });
-                if (typeof (web3Auth as any).authenticateUser === "function") {
+                if (typeof (web3Auth as unknown as { authenticateUser?: () => Promise<{ idToken: string }> }).authenticateUser === "function") {
                     try {
-                        const authRes = await (web3Auth as any).authenticateUser();
+                        const authRes = await (web3Auth as unknown as { authenticateUser: () => Promise<{ idToken: string }> }).authenticateUser();
                         console.log("authenticateUser result:", authRes); // Debug: Log the result of authenticateUser
                         idToken = authRes.idToken;
                     } catch (authError) {
@@ -113,9 +137,9 @@ export default function ValidatePage() {
                 } else {
                     console.warn("authenticateUser method not available on Web3Auth instance.");
                     // Fallback to getUserInfo if authenticateUser is unavailable
-                    if (typeof (web3Auth as any).getUserInfo === "function") {
+                    if (typeof (web3Auth as unknown as { getUserInfo?: () => Promise<{ idToken?: string; oAuthIdToken?: string; oAuthAccessToken?: string }> }).getUserInfo === "function") {
                         try {
-                            const userInfo = await (web3Auth as any).getUserInfo();
+                            const userInfo = await (web3Auth as unknown as { getUserInfo: () => Promise<{ idToken?: string; oAuthIdToken?: string; oAuthAccessToken?: string }> }).getUserInfo();
                             console.log("getUserInfo result:", userInfo); // Debug: Log the result of getUserInfo
                             idToken = userInfo.idToken || userInfo.oAuthIdToken || userInfo.oAuthAccessToken || "";
                         } catch (userInfoError) {
@@ -173,8 +197,9 @@ export default function ValidatePage() {
                 .then(res => res.json())
                 .then(json => json.verification);
             setData(updatedData);
-        } catch (e: any) {
-            setError(e.message);
+        } catch (e: unknown) {
+            const error = e as { message?: string };
+            setError(error.message || "An unknown error occurred");
         } finally {
             setLoading(false);
         }
@@ -250,34 +275,36 @@ export default function ValidatePage() {
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2 text-center">Transaction Details</h2>
                 <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4">
                     <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Invoice Details</h3>
-                    <p><strong>Date:</strong> {data.ai_result.analysis.invoice.Date}</p>
-                    <p><strong>Vendor Name:</strong> {data.ai_result.analysis.invoice.VendorName}</p>
-                    <p><strong>Total Amount:</strong> {data.ai_result.analysis.invoice.TotalAmount}</p>
-                    <p><strong>Transaction ID:</strong> {data.ai_result.analysis.invoice.TransactionID}</p>
+                    <p><strong>Date:</strong> {data.ai_result.analysis?.invoice?.Date || "N/A"}</p>
+                    <p><strong>Vendor Name:</strong> {data.ai_result.analysis?.invoice?.VendorName || "N/A"}</p>
+                    <p><strong>Total Amount:</strong> {data.ai_result.analysis?.invoice?.TotalAmount || "N/A"}</p>
+                    <p><strong>Transaction ID:</strong> {data.ai_result.analysis?.invoice?.TransactionID || "N/A"}</p>
                 </div>
 
                 <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4">
                     <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Receipt Details</h3>
-                    <p><strong>Date:</strong> {data.ai_result.analysis.receipt.Date}</p>
-                    <p><strong>Vendor Name:</strong> {data.ai_result.analysis.receipt.VendorName}</p>
-                    <p><strong>Total Amount:</strong> {data.ai_result.analysis.receipt.TotalAmount}</p>
-                    <p><strong>Transaction ID:</strong> {data.ai_result.analysis.receipt.TransactionID}</p>
+                    <p><strong>Date:</strong> {data.ai_result.analysis?.receipt?.Date || "N/A"}</p>
+                    <p><strong>Vendor Name:</strong> {data.ai_result.analysis?.receipt?.VendorName || "N/A"}</p>
+                    <p><strong>Total Amount:</strong> {data.ai_result.analysis?.receipt?.TotalAmount || "N/A"}</p>
+                    <p><strong>Transaction ID:</strong> {data.ai_result.analysis?.receipt?.TransactionID || "N/A"}</p>
                 </div>
 
                 <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4">
                     <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Consistency Check</h3>
-                    <p><strong>Date Match:</strong> {data.ai_result.analysis.consistency.Date ? "Yes" : "No"}</p>
-                    <p><strong>Vendor Name Match:</strong> {data.ai_result.analysis.consistency.VendorName ? "Yes" : "No"}</p>
-                    <p><strong>Total Amount Match:</strong> {data.ai_result.analysis.consistency.TotalAmount ? "Yes" : "No"}</p>
-                    <p><strong>Transaction ID Match:</strong> {data.ai_result.analysis.consistency.TransactionID ? "Yes" : "No"}</p>
+                    <p><strong>Date Match:</strong> {data.ai_result.analysis?.consistency?.Date ? "Yes" : "No"}</p>
+                    <p><strong>Vendor Name Match:</strong> {data.ai_result.analysis?.consistency?.VendorName ? "Yes" : "No"}</p>
+                    <p><strong>Total Amount Match:</strong> {data.ai_result.analysis?.consistency?.TotalAmount ? "Yes" : "No"}</p>
+                    <p><strong>Transaction ID Match:</strong> {data.ai_result.analysis?.consistency?.TransactionID ? "Yes" : "No"}</p>
                 </div>
 
-                {data.ai_result.analysis.discrepancies.length > 0 && (
+                {(data.ai_result.analysis?.discrepancies?.length ?? 0) > 0 && (
                     <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-4">
                         <h3 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Discrepancies</h3>
                         <ul className="list-disc pl-5">
-                            {data.ai_result.analysis.discrepancies.map((discrepancy: string, index: number) => (
-                                <li key={index}>{discrepancy}</li>
+                            {data.ai_result.analysis?.discrepancies?.map((discrepancy, index: number) => (
+                                <li key={index}>
+                                    <strong>{discrepancy.field}:</strong> Invoice shows &quot;{discrepancy.invoice}&quot;, Receipt shows &quot;{discrepancy.receipt}&quot;
+                                </li>
                             ))}
                         </ul>
                     </div>
@@ -289,9 +316,11 @@ export default function ValidatePage() {
                         <div className="grid grid-cols-3 gap-4">
                             {Array.isArray(data.image_urls) && data.image_urls.map((url: string, index: number) => (
                                 <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="block">
-                                    <img
+                                    <Image
                                         src={url}
                                         alt={`Document ${index + 1}`}
+                                        width={96}
+                                        height={96}
                                         className="w-full h-24 object-cover rounded shadow-md hover:shadow-lg transition-shadow duration-200"
                                     />
                                 </a>

@@ -2,14 +2,17 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
     <div className="max-w-lg mx-auto text-center py-20">
-      <img
-        src="Logo_Veripact.png"
+      <Image
+        src="/Logo_Veripact.png"
         alt="Veripact Logo"
-        className="mx-auto mb-8 w-96 h-96 object-contain"
+        width={384}
+        height={384}
+        className="mx-auto mb-8 object-contain"
       />
       <h1 className="text-4xl font-bold mb-6">Welcome to Veripact</h1>
       <Link

@@ -10,10 +10,21 @@ export default function VerificationsPage() {
   const router = useRouter();
   // Web3Auth modal/react hooks
   const { connect, isConnected, loading: connectLoading, error: connectError } = useWeb3AuthConnect();
-  const { disconnect, loading: disconnectLoading, error: disconnectError } = useWeb3AuthDisconnect();
   const { userInfo } = useWeb3AuthUser();
-  const { address, connector } = useAccount();
-  const [verifications, setVerifications] = useState<any[]>([]);
+  const [verifications, setVerifications] = useState<Array<{
+    id?: string;
+    status?: string;
+    created_at?: string;
+    link_uuid?: string;
+    seller_id?: string;
+    client_id?: string;
+    ai_result?: {
+      analysis?: {
+        invoice?: { TotalAmount?: string };
+        receipt?: { TotalAmount?: string };
+      };
+    };
+  }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,8 +43,9 @@ export default function VerificationsPage() {
         // Assumes backend route: /verifications?user_id=...
         const res = await api.get(`/verifications?user_id=${userInfo.userId}`);
         setVerifications(res.data.verifications || []);
-      } catch (e: any) {
-        setError(e.response?.data?.error || e.message || "Failed to load verifications");
+      } catch (e: unknown) {
+        const error = e as { response?: { data?: { error?: string } }; message?: string };
+        setError(error.response?.data?.error || error.message || "Failed to load verifications");
       } finally {
         setLoading(false);
       }

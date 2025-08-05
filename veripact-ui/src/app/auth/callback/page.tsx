@@ -6,7 +6,7 @@ import { useWeb3AuthConnect } from "@web3auth/modal/react";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
-  const { isConnected, loading, error } = useWeb3AuthConnect();
+  const { isConnected, loading } = useWeb3AuthConnect();
 
   useEffect(() => {
     if (loading) return;

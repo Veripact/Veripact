@@ -7,7 +7,7 @@ import SignInButton from "@/components/SignInButton";
 
 export default function AuthPage() {
   const router = useRouter();
-  const { connect, isConnected, loading, error } = useWeb3AuthConnect();
+  const { isConnected, loading } = useWeb3AuthConnect();
 
   useEffect(() => {
     if (isConnected) {

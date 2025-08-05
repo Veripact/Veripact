@@ -66,14 +66,14 @@ export default function DashboardPage() {
   const [result, setResult] = useState<VerificationResultData | null>(null);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { userInfo, loading: authLoading, error: authError } = useWeb3AuthUser();
+  const { userInfo, loading: authLoading } = useWeb3AuthUser();
   const { isConnected } = useWeb3AuthConnect();
 
   // Debug: log userInfo and wallet address after login
   React.useEffect(() => {
     if (userInfo) {
       console.log('Web3Auth userInfo:', userInfo);
-      const wallets = (userInfo as any)?.wallets;
+      const wallets = (userInfo as { wallets?: { address?: string; public_key?: string }[] })?.wallets;
       if (wallets && wallets.length > 0) {
         console.log('Wallet address:', wallets[0].address || wallets[0].public_key);
       } else {
@@ -142,10 +142,11 @@ export default function DashboardPage() {
         discrepancies: analysis.discrepancies,
         validationUrl: response.validationUrl,
       });
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const error = e as { response?: { data?: { error?: string } }; message?: string };
       setError(
-        e.response?.data?.error || 
-        e.message || 
+        error.response?.data?.error || 
+        error.message || 
         "Something went wrong – please try again."
       );
     } finally {

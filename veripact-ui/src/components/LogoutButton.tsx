@@ -15,7 +15,7 @@ type LogoutButtonProps = {
 const LogoutButton: React.FC<LogoutButtonProps> = ({ className = '' }) => {
   const router = useRouter();
 
-  const { disconnect, loading, error } = useWeb3AuthDisconnect();
+  const { disconnect } = useWeb3AuthDisconnect();
   const { isConnected } = useWeb3AuthConnect();
 
   const handleLogout = async () => {
