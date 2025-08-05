@@ -32,9 +32,15 @@ app.use(cors({
 // Explicit OPTIONS handler for preflight requests
 app.options('*', (req, res) => {
   const origin = req.headers.origin;
+  console.log(`OPTIONS request from origin: ${origin}`); // Log the origin for debugging
+
   if (allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
+    console.log(`Access-Control-Allow-Origin set to: ${origin}`); // Log the allowed origin
+  } else {
+    console.log(`Origin not allowed: ${origin}`); // Log disallowed origins
   }
+
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
