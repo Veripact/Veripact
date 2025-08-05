@@ -7,7 +7,7 @@ require("dotenv").config();
 const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
-const abi = require(path.resolve(__dirname, "../../contracts/VeripactReputation.json")).abi;
+const abi = require(path.resolve(__dirname, "../VeripactReputation.json")).abi;
 const contractAddress = process.env.CONTRACT_ADDRESS;
 const contract = new ethers.Contract(contractAddress, abi, wallet);
 
