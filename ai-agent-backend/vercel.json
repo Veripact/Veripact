@@ -4,7 +4,10 @@
     { "src": "api/index.js", "use": "@vercel/node" }
   ],
   "rewrites": [
-    { "source": "/verify-transaction", "destination": "/api/verify-transaction" }
+    { "source": "/verify-transaction", "destination": "/api/verify-transaction" },
+    { "source": "/verifications", "destination": "/api/verifications" },
+    { "source": "/validate", "destination": "/api/validate" },
+    { "source": "/submit_validation", "destination": "/api/submit_validation" }
   ],
   "headers": [
     {
