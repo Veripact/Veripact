@@ -1,6 +1,5 @@
 // services/supabase.js
 const { createClient } = require('@supabase/supabase-js');
-const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 require('dotenv').config();
@@ -77,8 +76,13 @@ async function uploadFileToBucket(fileInput, originalName, hash) {
   if (Buffer.isBuffer(fileInput)) {
     buffer = fileInput;
   } else if (typeof fileInput === 'string') {
-    // Legacy support for file paths (local development)
-    buffer = fs.readFileSync(fileInput);
+    // Legacy support for file paths (local development only)
+    try {
+      const fs = require('fs');
+      buffer = fs.readFileSync(fileInput);
+    } catch (error) {
+      throw new Error(`Failed to read file: ${error.message}. Note: file path support is only available in local development.`);
+    }
   } else {
     throw new Error('Invalid file input: must be Buffer or file path string');
   }

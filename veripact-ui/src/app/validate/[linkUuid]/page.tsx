@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useWeb3Auth } from "@web3auth/modal/react";
 import StarRating from "@/components/StarRating"; // Import the StarRating component
+import { getBackendUrl } from "@/lib/config";
 import Image from "next/image";
 
 // Updated the Verification type to match the actual property name in the data object
@@ -72,13 +73,10 @@ export default function ValidatePage() {
         }
     }, [isConnected, provider]);
 
-    // Use environment variable for backend URL
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3001";
-
     // Fetch verification data from backend when authenticated and not loading
     useEffect(() => {
         if (!isConnected || !account) return;
-        // Update fetch call to use backendUrl
+        const backendUrl = getBackendUrl();
         fetch(`${backendUrl}/validate/${linkUuid}`)
             .then(res => res.json())
             .then(json => setData(json.verification))
@@ -86,7 +84,7 @@ export default function ValidatePage() {
                 console.error('Failed to load data:', err);
                 setError("Failed to load data");
             });
-    }, [linkUuid, isConnected, account, backendUrl]);
+    }, [linkUuid, isConnected, account]);
 
     // Login handler
     const login = async () => {
@@ -164,7 +162,8 @@ export default function ValidatePage() {
             console.log("Access Token:", idToken); // Debug: Log the access token
             // POST rating to the new backend route
             const body = action === 'reject' ? { decision: 'reject' } : { rating_by_client: clientRating };
-            const res = await fetch(`${backendUrl}/submit_validation/${linkUuid}`, {
+            const submitUrl = getBackendUrl();
+            const res = await fetch(`${submitUrl}/submit_validation/${linkUuid}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -193,7 +192,8 @@ export default function ValidatePage() {
             });
 
             // Refetch updated data from the backend after successful submission
-            const updatedData = await fetch(`${backendUrl}/validate/${linkUuid}`)
+            const refetchUrl = getBackendUrl();
+            const updatedData = await fetch(`${refetchUrl}/validate/${linkUuid}`)
                 .then(res => res.json())
                 .then(json => json.verification);
             setData(updatedData);

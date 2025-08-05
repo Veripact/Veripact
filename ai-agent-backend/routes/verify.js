@@ -4,7 +4,6 @@ require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs').promises;
 const { createClient } = require('@supabase/supabase-js');
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');

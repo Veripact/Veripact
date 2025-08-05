@@ -1,5 +1,4 @@
 // services/gemini.js
-const fs      = require('fs');
 const path    = require('path');
 const axios   = require('axios');
 const { fromPath } = require('pdf2pic');
@@ -39,19 +38,6 @@ async function convertPdfToPng(pdfPath) {
  * Converts a buffer to generative part for Gemini API
  */
 function bufferToGenerativePart(buffer, mimeType) {
-  return {
-    inlineData: {
-      mimeType,
-      data: buffer.toString('base64'),
-    },
-  };
-}
-
-/**
- * Reads a file from disk and wraps it as an inlineData part.
- */
-function fileToGenerativePart(filePath, mimeType) {
-  const buffer = fs.readFileSync(filePath);
   return {
     inlineData: {
       mimeType,
