@@ -173,22 +173,23 @@ export default function DashboardPage() {
           <h3 className="font-medium mb-2">Upload Receipt</h3>
           <FileUploader files={receiptFile} onFilesChange={setReceiptFile} maxFiles={1} />
         </div>
-        {/* <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50"
-        >
-          {loading ? "Submitting…" : "Submit"}
-        </button> */}
+
         {error && <p className="text-red-600">{error}</p>}
         {!result && (
           <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50"
-          >
-            {loading ? "Submitting…" : "Submit"}
-          </button>
+          onClick={handleSubmit}
+          disabled={loading}
+          className="w-full bg-blue-500 text-white py-2 rounded disabled:opacity-50 flex items-center justify-center"
+        >
+          {loading ? (
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Processing...</span>
+            </div>
+          ) : (
+            "Submit"
+          )}
+        </button>
         )}
         {result && <VerificationResult result={result} />}
       </div>

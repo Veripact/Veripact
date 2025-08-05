@@ -368,9 +368,16 @@ export default function ValidatePage() {
             <button
                 onClick={() => handleValidationSubmission('validate')}
                 disabled={loading || clientRating === 0}
-                className={`w-full py-2 px-4 rounded-lg text-white ${loading || clientRating === 0 ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-blue-600 dark:bg-blue-400 hover:bg-blue-700 dark:hover:bg-blue-500'}`}
+                className={`w-full py-2 px-4 rounded-lg text-white ${loading || clientRating === 0 ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed' : 'bg-blue-600 dark:bg-blue-400 hover:bg-blue-700 dark:hover:bg-blue-500'} flex items-center justify-center`}
             >
-                {loading ? "Verifying Transaction…" : "Confirm"}
+                {loading ? (
+                    <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Verifying Transaction…</span>
+                    </div>
+                ) : (
+                    "Verify Transaction"
+                )}
             </button>
             <button
                 onClick={() => handleValidationSubmission('reject')}
