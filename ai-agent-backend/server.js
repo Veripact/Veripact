@@ -13,8 +13,21 @@ const verifyRoute = require('./routes/verify');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS for frontend dev
-app.use(cors({ origin: 'http://localhost:3000' }));
+// CORS configuration for both development and production
+const allowedOrigins = [
+  'http://localhost:3000',          // Local development
+  'https://veripact.vercel.app',    // Production frontend
+  'https://www.veripact.vercel.app', // Production frontend with www
+  'https://veripact-the-squids-projects.vercel.app/', // Staging frontend
+  'https://www.veripact-the-squids-projects.vercel.app/' // Staging frontend with www
+];
+
+app.use(cors({ 
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Parse JSON bodies
 app.use(express.json());
