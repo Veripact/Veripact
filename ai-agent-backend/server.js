@@ -66,3 +66,6 @@ app.use('/submit_validation', require('./routes/submit_validation'));
 
 // Export the app for Vercel serverless functions
 module.exports = app;
+
+// For Vercel serverless functions, also export a default handler
+module.exports.default = app;
