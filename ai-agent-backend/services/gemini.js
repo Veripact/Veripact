@@ -36,6 +36,18 @@ async function convertPdfToPng(pdfPath) {
 }
 
 /**
+ * Converts a buffer to generative part for Gemini API
+ */
+function bufferToGenerativePart(buffer, mimeType) {
+  return {
+    inlineData: {
+      mimeType,
+      data: buffer.toString('base64'),
+    },
+  };
+}
+
+/**
  * Reads a file from disk and wraps it as an inlineData part.
  */
 function fileToGenerativePart(filePath, mimeType) {
@@ -60,12 +72,12 @@ async function analyzeDocuments(files) {
     const isPdf = file.mimetype === 'application/pdf' || ext === '.pdf';
 
     if (isPdf) {
-      const pngs = await convertPdfToPng(file.path);
-      for (const p of pngs) {
-        imageParts.push(fileToGenerativePart(p, 'image/png'));
-      }
+      // For PDF files, we need to convert buffer to image
+      // For now, we'll skip PDF conversion in Vercel and ask users to upload images
+      throw new Error('PDF files are not supported in this deployment. Please upload image files (PNG, JPG, JPEG) instead.');
     } else {
-      imageParts.push(fileToGenerativePart(file.path, file.mimetype));
+      // Use buffer directly for image files
+      imageParts.push(bufferToGenerativePart(file.buffer, file.mimetype));
     }
   }
 

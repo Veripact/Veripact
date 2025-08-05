@@ -51,7 +51,13 @@ async function verifyWeb3AuthJWT(req, res, next) {
 }
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
+// Use memory storage for Vercel compatibility (no disk access)
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  }
+});
 
 router.post('/', upload.array('documents'), verifyWeb3AuthJWT, async (req, res) => {
   try {
