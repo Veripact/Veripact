@@ -72,7 +72,6 @@ export default function DashboardPage() {
   // Debug: log userInfo and wallet address after login
   React.useEffect(() => {
     if (userInfo) {
-      console.log('Web3Auth userInfo:', userInfo);
       const wallets = (userInfo as { wallets?: { address?: string; public_key?: string }[] })?.wallets;
       if (wallets && wallets.length > 0) {
         console.log('Wallet address:', wallets[0].address || wallets[0].public_key);

@@ -29,8 +29,34 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Explicit OPTIONS handler for preflight requests
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
+});
+
 // Parse JSON bodies
 app.use(express.json());
+
+// Health check route
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'AI Agent backend is running',
+    timestamp: new Date().toISOString(),
+    env_check: {
+      supabase_url: !!process.env.SUPABASE_URL,
+      supabase_key: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      gemini_key: !!process.env.GEMINI_API_KEY
+    }
+  });
+});
 
 // Routes
 app.use('/verify-transaction', require('./routes/verify')); // Seller flow - handles seller's document upload, AI analysis, blockchain recording, and rating
@@ -38,7 +64,5 @@ app.use('/validate', require('./routes/validate'));         // Client flow - han
 app.use('/verifications', require('./routes/verifications')); // Client flow - fetches verifications by link UUID
 app.use('/submit_validation', require('./routes/submit_validation'));
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`AI Agent backend running on http://localhost:${PORT}`);
-});
+// Export the app for Vercel serverless functions
+module.exports = app;
