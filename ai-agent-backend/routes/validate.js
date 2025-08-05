@@ -63,6 +63,11 @@ router.post('/:linkUuid', async (req, res) => {
     const status = clientRating === 1 ? 'rejected' : clientRating >= 3 ? 'approved' : 'pending'; // Updated logic to handle rejection explicitly
     console.debug('[DEBUG] Computed status:', status);
 
+    // Add validation to ensure linkUuid is provided
+    if (!linkUuid) {
+        return res.status(400).json({ success: false, error: 'Missing linkUuid parameter' });
+    }
+
     // 1) Verify Web3Auth JWT and extract user id
     const authHeader = req.headers.authorization;
     const token = authHeader?.split(' ')[1];

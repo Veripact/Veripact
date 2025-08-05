@@ -50,6 +50,12 @@ app.options('*', (req, res) => {
 // Parse JSON bodies
 app.use(express.json());
 
+// Add debugging middleware to log incoming requests
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.path}`);
+  next();
+});
+
 // Health check route
 app.get('/', (req, res) => {
   res.json({ 
