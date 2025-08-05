@@ -3,9 +3,6 @@
   "builds": [
     { "src": "api/index.js", "use": "@vercel/node" }
   ],
-  "routes": [
-    { "src": "/(.*)", "dest": "api/index.js" }
-  ],
   "rewrites": [
     { "source": "/verify-transaction", "destination": "/api/verify-transaction" }
   ],
