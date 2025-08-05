@@ -4,6 +4,7 @@
     { "src": "api/index.js", "use": "@vercel/node" }
   ],
   "rewrites": [
+    { "source": "/", "destination": "/api/index.js" },
     { "source": "/verify-transaction", "destination": "/routes/verify-transaction" },
     { "source": "/verifications", "destination": "/routes/verifications" },
     { "source": "/validate", "destination": "/routes/validate" },
